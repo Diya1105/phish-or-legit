@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Phish or Legit — Email Security Training</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+/* ─── Reset & tokens ─────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #F7F6F2;
+  --surface:   #FFFFFF;
+  --surface2:  #F0EFE9;
+  --border:    #E4E2D9;
+  --text:      #1A1916;
+  --muted:     #8A8880;
+  --danger:    #C0392B;
+  --danger-bg: #FDF1F0;
+  --safe:      #1A6B47;
+  --safe-bg:   #EFF8F3;
+  --accent:    #2C5F8A;
+  --accent-bg: #EEF4FA;
+  --warn:      #B45309;
+  --warn-bg:   #FEF9EE;
+  --radius:    12px;
+  --radius-lg: 20px;
+  --shadow:    0 1px 3px rgba(0,0,0,0.07), 0 4px 16px rgba(0,0,0,0.05);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.10);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/* ─── Layout ──────────────────────────────────────────── */
+.app {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 0 1.25rem 4rem;
+}
+
+/* ─── Header ──────────────────────────────────────────── */
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem 0 1.5rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 2rem;
+  animation: fadeDown 0.5s ease both;
+}
+
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.6rem;
+}
+
+.brand-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.55rem;
+  color: var(--text);
+  letter-spacing: -0.02em;
+}
+
+.brand-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  background: var(--accent-bg);
+  color: var(--accent);
+  border: 1px solid #C3D8EE;
+  padding: 0.2rem 0.55rem;
+  border-radius: 50px;
+}
+
+/* ─── Tabs ────────────────────────────────────────────── */
+.tabs {
+  display: flex;
+  gap: 0.25rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.3rem;
+}
+
+.tab-btn {
+  padding: 0.45rem 1.1rem;
+  border: none;
+  background: none;
+  border-radius: 7px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+  white-space: nowrap;
+}
+
+.tab-btn.active {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+/* ─── Section visibility ─────────────────────────────── */
+.section { display: none; }
+.section.active { display: block; animation: fadeUp 0.35s ease both; }
+
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeDown {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Stats bar ───────────────────────────────────────── */
+.stats-bar {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.stat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.1rem;
+  box-shadow: var(--shadow);
+}
+
+.stat-label {
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.3rem;
+}
+
+.stat-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.8rem;
+  color: var(--text);
+  line-height: 1;
+}
+
+.stat-value.green { color: var(--safe); }
+.stat-value.red   { color: var(--danger); }
+.stat-value.blue  { color: var(--accent); }
+
+/* ─── Progress ───────────────────────────────────────── */
+.progress-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.progress-track {
+  flex: 1;
+  height: 5px;
+  background: var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #4A90C4);
+  border-radius: 10px;
+  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.progress-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+/* ─── Email card ──────────────────────────────────────── */
+.email-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+  animation: cardSlide 0.4s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+
+@keyframes cardSlide {
+  from { opacity: 0; transform: scale(0.97) translateY(12px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.email-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+
+.email-dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dot {
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  background: var(--border);
+}
+
+.dot:nth-child(1) { background: #F87171; }
+.dot:nth-child(2) { background: #FBBF24; }
+.dot:nth-child(3) { background: #34D399; }
+
+/* Timer */
+.timer-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.timer-track {
+  width: 120px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.timer-fill {
+  height: 100%;
+  background: var(--safe);
+  border-radius: 10px;
+  transition: width 1s linear, background 0.5s;
+}
+
+.timer-fill.warn  { background: var(--warn); }
+.timer-fill.urgent { background: var(--danger); }
+
+.timer-text {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--muted);
+  min-width: 2rem;
+  text-align: right;
+}
+
+.timer-text.urgent { color: var(--danger); }
+
+/* Email meta */
+.email-meta {
+  padding: 1.25rem 1.5rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.meta-row {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.83rem;
+  margin-bottom: 0.3rem;
+  align-items: baseline;
+}
+
+.meta-key {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  min-width: 2.8rem;
+}
+
+.meta-val { color: var(--text); }
+
+.email-body {
+  padding: 1.5rem;
+  font-size: 0.92rem;
+  line-height: 1.8;
+  color: #3A3935;
+  white-space: pre-line;
+  min-height: 80px;
+}
+
+/* ─── Action row ──────────────────────────────────────── */
+.action-row {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.btn-judge {
+  flex: 1;
+  padding: 0.9rem 1.5rem;
+  border-radius: var(--radius);
+  border: 2px solid transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  letter-spacing: 0.01em;
+}
+
+.btn-phish {
+  background: var(--danger-bg);
+  color: var(--danger);
+  border-color: #F5C6C2;
+}
+
+.btn-phish:hover:not(:disabled) {
+  background: var(--danger);
+  color: white;
+  border-color: var(--danger);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(192,57,43,0.25);
+}
+
+.btn-legit {
+  background: var(--safe-bg);
+  color: var(--safe);
+  border-color: #B7DFC9;
+}
+
+.btn-legit:hover:not(:disabled) {
+  background: var(--safe);
+  color: white;
+  border-color: var(--safe);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(26,107,71,0.25);
+}
+
+.btn-judge:disabled { opacity: 0.45; cursor: not-allowed; transform: none; }
+
+/* ─── Feedback panel ──────────────────────────────────── */
+.feedback-panel {
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid;
+  display: none;
+  animation: fadeUp 0.3s ease both;
+}
+
+.feedback-panel.correct {
+  background: var(--safe-bg);
+  border-color: #B7DFC9;
+  display: block;
+}
+
+.feedback-panel.wrong {
+  background: var(--danger-bg);
+  border-color: #F5C6C2;
+  display: block;
+}
+
+.feedback-panel.timeout {
+  background: var(--warn-bg);
+  border-color: #F9D49A;
+  display: block;
+}
+
+.feedback-header {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.feedback-correct .feedback-header { color: var(--safe); }
+.feedback-wrong .feedback-header   { color: var(--danger); }
+
+.feedback-explanation {
+  font-size: 0.85rem;
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+/* Red flags */
+.flags-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  margin-top: 0.75rem;
+}
+
+.flag-chip {
+  font-size: 0.73rem;
+  font-family: 'DM Mono', monospace;
+  padding: 0.2rem 0.65rem;
+  border-radius: 50px;
+  border: 1px solid;
+  animation: chipIn 0.3s ease both;
+}
+
+@keyframes chipIn {
+  from { opacity: 0; transform: scale(0.8); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.flag-chip.red   { background: var(--danger-bg); border-color: #F5C6C2; color: var(--danger); }
+.flag-chip.green { background: var(--safe-bg);   border-color: #B7DFC9; color: var(--safe); }
+
+/* ─── Next button ─────────────────────────────────────── */
+.btn-next {
+  width: 100%;
+  padding: 0.85rem;
+  background: var(--text);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: none;
+  transition: opacity 0.18s, transform 0.18s;
+  letter-spacing: 0.02em;
+}
+
+.btn-next:hover { opacity: 0.85; transform: translateY(-1px); }
+.btn-next.visible { display: block; animation: fadeUp 0.3s ease both; }
+
+/* ─── End screen ──────────────────────────────────────── */
+.end-screen {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 3rem 2rem;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+  display: none;
+  animation: fadeUp 0.5s ease both;
+}
+
+.end-screen.visible { display: block; }
+
+.end-grade {
+  font-family: 'DM Serif Display', serif;
+  font-size: 5rem;
+  line-height: 1;
+  margin-bottom: 0.5rem;
+}
+
+.end-grade.genius { color: var(--safe); }
+.end-grade.aware  { color: var(--accent); }
+.end-grade.risky  { color: var(--danger); }
+
+.end-label {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.4rem;
+  color: var(--text);
+  margin-bottom: 0.5rem;
+}
+
+.end-meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-bottom: 2rem;
+  font-family: 'DM Mono', monospace;
+}
+
+.btn-restart {
+  padding: 0.85rem 2.5rem;
+  background: var(--text);
+  color: white;
+  border: none;
+  border-radius: 50px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.18s, transform 0.18s;
+}
+
+.btn-restart:hover { opacity: 0.82; transform: translateY(-2px); }
+
+/* ─── AI Checker ──────────────────────────────────────── */
+.checker-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 1.5rem;
+}
+
+.checker-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem;
+  margin-bottom: 0.3rem;
+}
+
+.checker-subtitle {
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-bottom: 1.25rem;
+}
+
+.checker-textarea {
+  width: 100%;
+  min-height: 140px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.9rem 1rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  line-height: 1.7;
+  color: var(--text);
+  background: var(--bg);
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.18s;
+}
+
+.checker-textarea:focus { border-color: var(--accent); }
+.checker-textarea::placeholder { color: var(--muted); }
+
+.checker-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 0.9rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.btn-check {
+  padding: 0.7rem 1.75rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn-check:hover:not(:disabled) { background: #1E4A6E; transform: translateY(-1px); }
+.btn-check:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.ai-result {
+  font-size: 0.85rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.ai-verdict {
+  font-weight: 600;
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.ai-verdict.phish { color: var(--danger); }
+.ai-verdict.legit { color: var(--safe); }
+
+.ai-reason { color: var(--muted); font-size: 0.82rem; line-height: 1.5; }
+
+/* spinner */
+.spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Leaderboard ─────────────────────────────────────── */
+.lb-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+
+.lb-header {
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.lb-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 1.1rem;
+}
+
+.lb-subtitle { font-size: 0.78rem; color: var(--muted); }
+
+.lb-table { width: 100%; border-collapse: collapse; }
+
+.lb-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.68rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--muted);
+  padding: 0.65rem 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface2);
+}
+
+.lb-table td {
+  padding: 0.85rem 1.5rem;
+  font-size: 0.88rem;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.lb-table tr:last-child td { border-bottom: none; }
+
+.lb-table tr:hover td { background: var(--bg); }
+
+.lb-rank {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--muted);
+  width: 2rem;
+}
+
+.lb-rank.gold   { color: #B7872A; font-weight: 700; }
+.lb-rank.silver { color: #808080; font-weight: 700; }
+.lb-rank.bronze { color: #A0522D; font-weight: 700; }
+
+.lb-name {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.lb-score {
+  font-family: 'DM Mono', monospace;
+  font-weight: 600;
+  color: var(--accent);
+  text-align: right;
+}
+
+.lb-accuracy {
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-align: right;
+}
+
+.lb-empty {
+  text-align: center;
+  padding: 3rem;
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.lb-input-row {
+  padding: 1.25rem 1.5rem;
+  background: var(--surface2);
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.lb-name-input {
+  flex: 1;
+  padding: 0.6rem 0.9rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.18s;
+}
+
+.lb-name-input:focus { border-color: var(--accent); }
+
+.btn-submit-score {
+  padding: 0.6rem 1.25rem;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: var(--radius);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.18s;
+  white-space: nowrap;
+}
+
+.btn-submit-score:hover { opacity: 0.85; }
+.btn-submit-score:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ─── Loading state ───────────────────────────────────── */
+.loading-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--muted);
+}
+
+.loading-dot {
+  display: inline-block;
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--border);
+  margin: 0 3px;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.loading-dot:nth-child(2) { animation-delay: 0.2s; }
+.loading-dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes pulse {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40%           { transform: scale(1);   opacity: 1; }
+}
+
+/* ─── Toasts ──────────────────────────────────────────── */
+.toast-container {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toast {
+  background: var(--text);
+  color: white;
+  padding: 0.7rem 1.1rem;
+  border-radius: var(--radius);
+  font-size: 0.82rem;
+  font-weight: 500;
+  box-shadow: var(--shadow-lg);
+  animation: toastIn 0.3s ease both;
+  max-width: 280px;
+}
+
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ─── Responsive ──────────────────────────────────────── */
+@media (max-width: 600px) {
+  .stats-bar { grid-template-columns: repeat(2, 1fr); }
+  .site-header { flex-direction: column; align-items: flex-start; gap: 1rem; }
+  .action-row { flex-direction: column; }
+  .lb-table th:nth-child(3),
+  .lb-table td:nth-child(3) { display: none; }
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="brand">
+      <span class="brand-title">Phish or Legit</span>
+      <span class="brand-badge">Security Training</span>
+    </div>
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" onclick="switchTab('game')"   id="tab-game">🎮 Game</button>
+      <button class="tab-btn"        onclick="switchTab('checker')" id="tab-checker">🤖 AI Checker</button>
+      <button class="tab-btn"        onclick="switchTab('board')"   id="tab-board">🏆 Leaderboard</button>
+    </div>
+  </header>
+
+  <!-- ══════ GAME SECTION ══════ -->
+  <section class="section active" id="section-game">
+
+    <!-- Stats -->
+    <div class="stats-bar" id="statsBar">
+      <div class="stat-card">
+        <div class="stat-label">Score</div>
+        <div class="stat-value blue" id="statScore">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Correct</div>
+        <div class="stat-value green" id="statCorrect">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Wrong</div>
+        <div class="stat-value red" id="statWrong">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Streak</div>
+        <div class="stat-value" id="statStreak">0</div>
+      </div>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-row">
+      <div class="progress-track">
+        <div class="progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+      <span class="progress-label" id="progressLabel">0 / 5</span>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading-state" id="loadingState">
+      <div>
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+        <span class="loading-dot"></span>
+      </div>
+      <p style="margin-top:0.75rem;font-size:0.82rem;">Loading emails from server…</p>
+    </div>
+
+    <!-- Email card -->
+    <div class="email-card" id="emailCard" style="display:none">
+      <div class="email-toolbar">
+        <div class="email-dots">
+          <div class="dot"></div><div class="dot"></div><div class="dot"></div>
+        </div>
+        <div class="timer-wrap">
+          <div class="timer-track">
+            <div class="timer-fill" id="timerFill"></div>
+          </div>
+          <span class="timer-text" id="timerText">30s</span>
+        </div>
+      </div>
+
+      <div class="email-meta">
+        <div class="meta-row">
+          <span class="meta-key">From</span>
+          <span class="meta-val" id="metaFrom">—</span>
+        </div>
+        <div class="meta-row">
+          <span class="meta-key">To</span>
+          <span class="meta-val">you@company.com</span>
+        </div>
+      </div>
+
+      <div class="email-body" id="emailBody"></div>
+    </div>
+
+    <!-- Feedback -->
+    <div class="feedback-panel" id="feedbackPanel">
+      <div class="feedback-header" id="feedbackHeader"></div>
+      <div class="feedback-explanation" id="feedbackExplanation"></div>
+      <div class="flags-list" id="flagsList"></div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="action-row" id="actionRow" style="display:none">
+      <button class="btn-judge btn-phish" id="btnPhish" onclick="answer(true)">
+        🎣 It's Phishing
+      </button>
+      <button class="btn-judge btn-legit" id="btnLegit" onclick="answer(false)">
+        ✅ It's Legitimate
+      </button>
+    </div>
+
+    <!-- Next -->
+    <button class="btn-next" id="btnNext" onclick="nextEmail()">
+      Continue to next email →
+    </button>
+
+    <!-- End screen -->
+    <div class="end-screen" id="endScreen">
+      <div class="end-grade" id="endGrade"></div>
+      <div class="end-label" id="endLabel"></div>
+      <div class="end-meta" id="endMeta"></div>
+
+      <!-- Submit to leaderboard -->
+      <div style="display:flex;gap:0.75rem;justify-content:center;flex-wrap:wrap;margin-bottom:1.5rem;">
+        <input type="text" id="endNameInput" placeholder="Your name for the leaderboard…"
+          style="padding:0.65rem 1rem;border:1px solid var(--border);border-radius:var(--radius);font-family:'DM Sans',sans-serif;font-size:0.85rem;outline:none;min-width:220px;" />
+        <button class="btn-submit-score" onclick="submitToLeaderboard()">Submit Score</button>
+      </div>
+
+      <button class="btn-restart" onclick="restartGame()">Play Again</button>
+    </div>
+
+  </section>
+
+  <!-- ══════ AI CHECKER SECTION ══════ -->
+  <section class="section" id="section-checker">
+    <div class="checker-card">
+      <div class="checker-title">AI Email Analyzer</div>
+      <div class="checker-subtitle">Paste any suspicious email and our AI will classify it instantly.</div>
+
+      <textarea class="checker-textarea" id="checkerInput"
+        placeholder="Paste email content here…&#10;&#10;e.g. &quot;Your account has been suspended. Click here to verify your details immediately.&quot;"></textarea>
+
+      <div class="checker-footer">
+        <button class="btn-check" id="btnCheck" onclick="checkCustomEmail()">
+          <span id="checkBtnText">Analyze with AI</span>
+        </button>
+        <div class="ai-result" id="aiResult" style="display:none">
+          <div>
+            <div class="ai-verdict" id="aiVerdict"></div>
+            <div class="ai-reason"  id="aiReason"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info cards -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0.75rem;margin-top:0.5rem;">
+      <div style="background:var(--danger-bg);border:1px solid #F5C6C2;border-radius:var(--radius);padding:1.1rem 1.25rem;">
+        <div style="font-weight:600;color:var(--danger);margin-bottom:0.4rem;font-size:0.88rem;">🚩 Common Phishing Signs</div>
+        <ul style="font-size:0.8rem;color:var(--muted);line-height:1.8;list-style:none;">
+          <li>• Urgent threats or deadlines</li>
+          <li>• Requests for passwords</li>
+          <li>• Mismatched or misspelled domains</li>
+          <li>• Too-good-to-be-true offers</li>
+          <li>• Fake prize or refund claims</li>
+        </ul>
+      </div>
+      <div style="background:var(--safe-bg);border:1px solid #B7DFC9;border-radius:var(--radius);padding:1.1rem 1.25rem;">
+        <div style="font-weight:600;color:var(--safe);margin-bottom:0.4rem;font-size:0.88rem;">✅ Signs of a Legit Email</div>
+        <ul style="font-size:0.8rem;color:var(--muted);line-height:1.8;list-style:none;">
+          <li>• Official sender domain</li>
+          <li>• No pressure or urgency</li>
+          <li>• Links match displayed text</li>
+          <li>• No request for credentials</li>
+          <li>• Calm, informational tone</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══════ LEADERBOARD SECTION ══════ -->
+  <section class="section" id="section-board">
+    <div class="lb-card">
+      <div class="lb-header">
+        <div>
+          <div class="lb-title">Top Players</div>
+          <div class="lb-subtitle">Scores from this session</div>
+        </div>
+      </div>
+
+      <table class="lb-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Player</th>
+            <th>Accuracy</th>
+            <th style="text-align:right">Score</th>
+          </tr>
+        </thead>
+        <tbody id="lbBody">
+          <tr><td colspan="4" class="lb-empty">No scores yet — finish a game to appear here!</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</div><!-- /app -->
+
+<!-- Toast container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const API = 'http://localhost:5000';
+
+/* ─── State ─────────────────────────────────────────── */
+const state = {
+  emails: [],
+  current: 0,
+  score: 0,
+  correct: 0,
+  wrong: 0,
+  streak: 0,
+  answered: false,
+  timerInterval: null,
+  timeLeft: 30,
+  maxTime: 30
+};
+
+/* ─── Tabs ───────────────────────────────────────────── */
+function switchTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  document.getElementById('tab-' + name).classList.add('active');
+  if (name === 'board') renderLeaderboard();
+}
+
+/* ─── Init ───────────────────────────────────────────── */
+async function initGame() {
+  document.getElementById('loadingState').style.display = 'block';
+  document.getElementById('emailCard').style.display = 'none';
+  document.getElementById('actionRow').style.display = 'none';
+  document.getElementById('endScreen').classList.remove('visible');
+  document.getElementById('feedbackPanel').style.display = 'none';
+  document.getElementById('btnNext').classList.remove('visible');
+
+  try {
+    const res = await fetch(`${API}/emails`);
+    if (!res.ok) throw new Error('Server error');
+    state.emails = await res.json();
+  } catch (e) {
+    document.getElementById('loadingState').innerHTML =
+      `<p style="color:var(--danger);font-size:0.85rem;">⚠️ Could not connect to server at ${API}.<br>Make sure your backend is running.</p>`;
+    return;
+  }
+
+  document.getElementById('loadingState').style.display = 'none';
+  state.current = 0;
+  state.score = 0;
+  state.correct = 0;
+  state.wrong = 0;
+  state.streak = 0;
+  updateStats();
+  loadEmail();
+}
+
+/* ─── Load email ─────────────────────────────────────── */
+function loadEmail() {
+  if (state.current >= state.emails.length) { endGame(); return; }
+
+  const email = state.emails[state.current];
+  state.answered = false;
+
+  // Dynamic time: longer message = more time (min 20s, max 45s)
+  const wordCount = email.message.split(' ').length;
+  state.maxTime = Math.min(45, Math.max(20, Math.ceil(wordCount / 3) * 3));
+  state.timeLeft = state.maxTime;
+
+  // Populate card
+  document.getElementById('metaFrom').textContent = 'notifications@service.com'; // generic sender
+  document.getElementById('emailBody').textContent = email.message;
+
+  // Progress
+  const pct = (state.current / state.emails.length) * 100;
+  document.getElementById('progressFill').style.width = pct + '%';
+  document.getElementById('progressLabel').textContent = `${state.current} / ${state.emails.length}`;
+
+  // Reset feedback
+  const fp = document.getElementById('feedbackPanel');
+  fp.style.display = 'none';
+  fp.className = 'feedback-panel';
+  document.getElementById('flagsList').innerHTML = '';
+  document.getElementById('btnNext').classList.remove('visible');
+
+  // Show card + buttons
+  const card = document.getElementById('emailCard');
+  card.style.display = 'block';
+  card.style.animation = 'none';
+  requestAnimationFrame(() => { card.style.animation = 'cardSlide 0.4s cubic-bezier(0.34,1.4,0.64,1) both'; });
+
+  const ar = document.getElementById('actionRow');
+  ar.style.display = 'flex';
+  document.getElementById('btnPhish').disabled = false;
+  document.getElementById('btnLegit').disabled = false;
+
+  startTimer();
+}
+
+/* ─── Timer ──────────────────────────────────────────── */
+function startTimer() {
+  clearInterval(state.timerInterval);
+  updateTimerUI();
+
+  state.timerInterval = setInterval(() => {
+    state.timeLeft--;
+    updateTimerUI();
+    if (state.timeLeft <= 0) {
+      clearInterval(state.timerInterval);
+      if (!state.answered) timeOut();
+    }
+  }, 1000);
+}
+
+function updateTimerUI() {
+  const t = state.timeLeft;
+  const pct = (t / state.maxTime) * 100;
+  const fill = document.getElementById('timerFill');
+  const text = document.getElementById('timerText');
+
+  fill.style.width = pct + '%';
+  fill.className = 'timer-fill' + (t <= 5 ? ' urgent' : t <= 10 ? ' warn' : '');
+  text.textContent = t + 's';
+  text.className = 'timer-text' + (t <= 5 ? ' urgent' : '');
+}
+
+function timeOut() {
+  state.answered = true;
+  state.score -= 5;
+  state.streak = 0;
+  if (state.score < 0) state.score = 0;
+  updateStats();
+
+  showFeedback('timeout', "⏱ Time's up!", "You ran out of time. −5 points.",
+    state.emails[state.current].explanation, state.emails[state.current].isPhishing);
+  disableButtons();
+  showNext();
+}
+
+/* ─── Answer ─────────────────────────────────────────── */
+function answer(userSaysPhish) {
+  if (state.answered) return;
+  state.answered = true;
+  clearInterval(state.timerInterval);
+  disableButtons();
+
+  const email = state.emails[state.current];
+  const correct = (userSaysPhish === Boolean(email.isPhishing));
+
+  if (correct) {
+    state.score += 10;
+    state.correct++;
+    state.streak++;
+    showFeedback('correct', '✓ Correct!', `+10 points${state.streak >= 3 ? ' 🔥 ' + state.streak + ' streak!' : ''}`,
+      email.explanation, email.isPhishing);
+    if (state.streak >= 3) toast(`🔥 ${state.streak}-answer streak!`);
+  } else {
+    state.score = Math.max(0, state.score - 5);
+    state.wrong++;
+    state.streak = 0;
+    showFeedback('wrong', '✗ Incorrect', '−5 points', email.explanation, email.isPhishing);
+  }
+
+  updateStats();
+  showNext();
+}
+
+/* ─── Feedback ───────────────────────────────────────── */
+function showFeedback(type, header, sub, explanation, isPhishing) {
+  const panel = document.getElementById('feedbackPanel');
+  const classMap = { correct: 'feedback-panel correct', wrong: 'feedback-panel wrong', timeout: 'feedback-panel timeout' };
+  panel.className = classMap[type];
+  panel.style.display = 'block';
+
+  document.getElementById('feedbackHeader').textContent = header + ' ' + sub;
+  document.getElementById('feedbackExplanation').textContent = explanation;
+
+  // Generate smart flag chips based on content
+  const msg = (state.emails[state.current]?.message || '').toLowerCase();
+  const flags = [];
+
+  if (isPhishing) {
+    if (/urgent|immediately|now|asap|hours|minutes/i.test(msg)) flags.push({ text: 'Urgency tactic', cls: 'red' });
+    if (/password|credentials|verify|confirm|login/i.test(msg))  flags.push({ text: 'Credential request', cls: 'red' });
+    if (/prize|win|claim|reward|bonus|lottery/i.test(msg))        flags.push({ text: 'Reward bait', cls: 'red' });
+    if (/suspend|block|close|delete|freeze/i.test(msg))           flags.push({ text: 'Threat / suspension', cls: 'red' });
+    if (/payment|bank|card|refund|invoice/i.test(msg))            flags.push({ text: 'Financial pressure', cls: 'red' });
+    if (/click|link|http/i.test(msg))                             flags.push({ text: 'Action bait', cls: 'red' });
+    if (flags.length === 0) flags.push({ text: 'Manipulative language', cls: 'red' });
+  } else {
+    if (/confirmed|completed|success/i.test(msg))  flags.push({ text: 'Routine confirmation', cls: 'green' });
+    if (/reminder|update|schedule/i.test(msg))     flags.push({ text: 'Informational tone', cls: 'green' });
+    if (/meeting|team|project|document/i.test(msg))flags.push({ text: 'Internal communication', cls: 'green' });
+    if (flags.length === 0) flags.push({ text: 'No malicious intent', cls: 'green' });
+    flags.push({ text: 'No credential request', cls: 'green' });
+  }
+
+  const list = document.getElementById('flagsList');
+  list.innerHTML = '';
+  flags.forEach((f, i) => {
+    const chip = document.createElement('span');
+    chip.className = `flag-chip ${f.cls}`;
+    chip.textContent = (f.cls === 'red' ? '🚩 ' : '✓ ') + f.text;
+    chip.style.animationDelay = (i * 60) + 'ms';
+    list.appendChild(chip);
+  });
+}
+
+function disableButtons() {
+  document.getElementById('btnPhish').disabled = true;
+  document.getElementById('btnLegit').disabled = true;
+}
+
+function showNext() {
+  document.getElementById('btnNext').classList.add('visible');
+}
+
+function nextEmail() {
+  state.current++;
+  loadEmail();
+}
+
+function updateStats() {
+  document.getElementById('statScore').textContent   = state.score;
+  document.getElementById('statCorrect').textContent = state.correct;
+  document.getElementById('statWrong').textContent   = state.wrong;
+  document.getElementById('statStreak').textContent  = state.streak;
+}
+
+/* ─── End game ───────────────────────────────────────── */
+function endGame() {
+  clearInterval(state.timerInterval);
+  document.getElementById('emailCard').style.display = 'none';
+  document.getElementById('actionRow').style.display = 'none';
+  document.getElementById('feedbackPanel').style.display = 'none';
+  document.getElementById('btnNext').classList.remove('visible');
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('progressLabel').textContent = `${state.emails.length} / ${state.emails.length}`;
+
+  const end = document.getElementById('endScreen');
+  end.classList.add('visible');
+
+  let grade, label, cls;
+  if (state.score >= 25) {
+    grade = '🧠'; label = 'Cybersecurity Genius'; cls = 'genius';
+  } else if (state.score >= 10) {
+    grade = '👍'; label = 'Security Aware'; cls = 'aware';
+  } else {
+    grade = '😬'; label = 'Easily Phishable'; cls = 'risky';
+  }
+
+  document.getElementById('endGrade').textContent = grade;
+  document.getElementById('endGrade').className = `end-grade ${cls}`;
+  document.getElementById('endLabel').textContent = label;
+  document.getElementById('endMeta').textContent =
+    `Score: ${state.score} · ${state.correct}/${state.emails.length} correct · Best streak: ${state.streak}`;
+}
+
+function restartGame() {
+  document.getElementById('endScreen').classList.remove('visible');
+  state.score = 0; state.correct = 0; state.wrong = 0; state.streak = 0;
+  updateStats();
+  initGame();
+}
+
+/* ─── Leaderboard ─────────────────────────────────────── */
+let leaderboard = JSON.parse(localStorage.getItem('phish_lb') || '[]');
+
+function submitToLeaderboard() {
+  const name = document.getElementById('endNameInput').value.trim();
+  if (!name) { toast('Please enter your name first.'); return; }
+
+  const entry = {
+    name,
+    score: state.score,
+    correct: state.correct,
+    total: state.emails.length,
+    date: new Date().toLocaleDateString()
+  };
+
+  leaderboard.push(entry);
+  leaderboard.sort((a, b) => b.score - a.score);
+  leaderboard = leaderboard.slice(0, 20);
+  localStorage.setItem('phish_lb', JSON.stringify(leaderboard));
+
+  toast('Score submitted! 🏆');
+  document.getElementById('endNameInput').value = '';
+  switchTab('board');
+}
+
+function renderLeaderboard() {
+  const tbody = document.getElementById('lbBody');
+  if (!leaderboard.length) {
+    tbody.innerHTML = '<tr><td colspan="4" class="lb-empty">No scores yet — finish a game to appear here!</td></tr>';
+    return;
+  }
+
+  const rankClass = ['gold', 'silver', 'bronze'];
+  tbody.innerHTML = leaderboard.map((e, i) => `
+    <tr>
+      <td class="lb-rank ${rankClass[i] || ''}">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i + 1}</td>
+      <td class="lb-name">${escHtml(e.name)}</td>
+      <td class="lb-accuracy">${e.correct}/${e.total}</td>
+      <td class="lb-score">${e.score}</td>
+    </tr>
+  `).join('');
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ─── AI Checker ──────────────────────────────────────── */
+async function checkCustomEmail() {
+  const message = document.getElementById('checkerInput').value.trim();
+  if (!message) { toast('Please paste some email content first.'); return; }
+
+  const btn = document.getElementById('btnCheck');
+  const btnText = document.getElementById('checkBtnText');
+  btn.disabled = true;
+  btnText.innerHTML = '<span class="spinner"></span> Analyzing…';
+  document.getElementById('aiResult').style.display = 'none';
+
+  try {
+    const res = await fetch(`${API}/check-email`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message })
+    });
+    if (!res.ok) throw new Error('Server error');
+    const data = await res.json();
+
+    const verdict = document.getElementById('aiVerdict');
+    const reason  = document.getElementById('aiReason');
+
+    verdict.textContent = data.isPhishing ? '⚠️ Phishing Detected' : '✅ Looks Legitimate';
+    verdict.className   = 'ai-verdict ' + (data.isPhishing ? 'phish' : 'legit');
+    reason.textContent  = data.reason || '';
+
+    document.getElementById('aiResult').style.display = 'flex';
+  } catch (e) {
+    toast('⚠️ Could not reach the AI server. Make sure your backend is running.');
+  } finally {
+    btn.disabled = false;
+    btnText.textContent = 'Analyze with AI';
+  }
+}
+
+/* ─── Toast ──────────────────────────────────────────── */
+function toast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+/* ─── Start ──────────────────────────────────────────── */
+initGame();
+</script>
+</body>
+</html>
